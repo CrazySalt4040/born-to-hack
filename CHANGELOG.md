@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3 family and world update — 2026-10-16
+
+- Reduce the stat panel to five visible attributes; keep suspicion and loyalty hidden, with occasional consequential daily incidents.
+- Add independently seeded fictional political fluctuations, bounded surveillance/legal strictness and modest domestic risk effects.
+- Generate 3–4 automatic childhood entries per year, without additional prompts or mortality rolls.
+- Add dating and household-work choices, earlier marriage/parenthood, and optional family-companion selection at departure. Persist outcomes, costs and separation in saves/history/endings.
+- Keep old v3 saves compatible; validate optional world and journey fields. Add six social/world regression tests.
+
 ## 0.3 pacing update — 2026-10-16
 
 - Replace 100 recurring mundane prompts with annual contextual logs and gradual skill development; retain the original definitions as reference.

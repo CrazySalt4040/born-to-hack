@@ -69,10 +69,17 @@ export function buildEvents(original:Event[],careers:string[]):Event[] {
     scene('legend-nyc',50,75,'ニューヨーク市長選挙','米国市民として市内に住み、選挙を戦う。候補者資格は勝利を保証しない。',[
       {text:'市長選挙に立候補する',base:2,minimum:{politics:90,language:85,network:85},career:'ニューヨーク市長'},
     ],{...rareBase,countries:['米国'],requires:[...common.requires,'us_citizen','nyc_resident','nyc_campaign']}),
-    scene('marriage',30,60,'誰かと暮らす','一緒に生活を築くことを考える相手がいる。相手にも意思と事情がある。',[
-      {text:'結婚を申し込む',base:55,familyStatus:'married',flags:['partner'],family:15},
-    ],{...common,excludes:['partner']}),
-    scene('child',35,55,'家族を迎える','子を育てる責任について、パートナーと話し合う。実現にはさまざまな事情が関わる。',[
+    scene('dating',20,55,'気になる人','話していると落ち着く相手がいる。交際を申し込むか。',[
+      {text:'付き合いたいと伝える',base:70,flags:['dating'],family:5,success:'相手も同じ気持ちだった。交際が始まった。',failure:'相手の気持ちは違った。友人として距離を保つことにした。'},
+    ],{...common,excludes:['partner','dating']}),
+    scene('household-work',24,65,'ふたりの働き方','家計と家の時間をどう分けるか、伴侶と相談する。',[
+      {text:'共働きを相談する',base:85,flags:['dual_income'],removeFlags:['home_focus'],success:'ふたりで働くことにした。収入と家事の両方を分け合う。'},
+      {text:'片方が家庭を中心にする',base:85,flags:['home_focus'],removeFlags:['dual_income'],family:5,success:'家計を見直し、家庭に使う時間を増やした。'},
+    ],{...common,requires:[...common.requires,'partner']}),
+    scene('marriage',23,60,'誰かと暮らす','一緒に生活を築くことを考える相手がいる。相手にも意思と事情がある。',[
+      {text:'結婚を申し込む',base:55,familyStatus:'married',flags:['partner'],removeFlags:['dating'],family:15},
+    ],{requires:[...common.requires,'dating'],excludes:['partner']}),
+    scene('child',24,55,'家族を迎える','子を育てる責任について、パートナーと話し合う。実現にはさまざまな事情が関わる。',[
       {text:'子を迎える準備をする',base:45,children:1,flags:['parent'],family:10,effects:{wealth:-8}},
     ],{...common,requires:[...common.requires,'partner']}),
     scene('divorce',50,65,'すれ違う生活','仕事と家庭のすれ違いが続く。関係をどう扱うか。',[
@@ -126,5 +133,7 @@ export function buildEvents(original:Event[],careers:string[]):Event[] {
       {text:'過去を文章に残す',base:90,effects:{creativity:8},flags:['memoir']},
     ],common),
   );
+  const decline:Record<string,string>={dating:'今は付き合わない',marriage:'結婚は見送る',child:'今は子どもを持たない','household-work':'今の働き方を続ける'};
+  for(const e of events)if(decline[e.id])e.choices[e.choices.length-1]={...e.choices[e.choices.length-1],text:decline[e.id]};
   return events;
 }

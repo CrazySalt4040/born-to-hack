@@ -1,3 +1,4 @@
+import {companionLabels} from './social-world';
 import {careers, familyStatuses, statNames, makeEnding, factSentences, type State} from './engine';
 export const SAVE_KEY='born-to-hack-v3';
 const record=(x:unknown):x is Record<string,unknown>=>!!x&&typeof x==='object'&&!Array.isArray(x);
@@ -8,6 +9,12 @@ export function deserialize(text:string):State {
   const s:unknown=JSON.parse(text);
   if(!record(s)||s.version!==3)throw Error('v0.3以外のセーブ形式です。旧データは保持されています。');
   if(!number(s.age,0,119.5)||s.birthYear!==1998||typeof s.alive!=='boolean'||!number(s.seed,0,4294967295)||!Number.isInteger(s.seed)||!number(s.eventIndex,0,2000)||!Number.isInteger(s.eventIndex)||!record(s.stats)||!statNames.every(k=>number((s.stats as Record<string,unknown>)[k],0,100))||!record(s.risks)||!['nutrition','medical','stress','childhoodHealth'].every(k=>number((s.risks as Record<string,unknown>)[k],0,100))||!strings(s.flags)||!strings(s.achievements)||!careers.includes(s.career as string)||!['北朝鮮','韓国','日本','フランス','米国'].includes(s.country as string)||!familyStatuses.includes(s.familyStatus as State['familyStatus'])||!number(s.family,0,100)||!number(s.children,0,10)||!number(s.grandchildren,0,20)||!Number.isInteger(s.children)||!Number.isInteger(s.grandchildren)||!number(s.residenceSince,0,s.age as number)||typeof s.retired!=='boolean'||!Array.isArray(s.history)||s.history.length>2000||!s.history.every(h=>record(h)&&number(h.age,0,s.age as number)&&typeof h.title==='string'&&h.title.length<=200&&typeof h.detail==='string'&&h.detail.length<=2000))throw Error('セーブデータが破損しています');
+  if(s.world!==undefined&&(!record(s.world)||!number(s.world.seed,0,4294967295)||!Number.isInteger(s.world.seed)||!number(s.world.surveillance,35,65)||!number(s.world.law,35,65)||typeof s.world.headline!=='string'||s.world.headline.length>500))throw Error('Invalid political climate');
+  if(s.journey!==undefined){
+    if(!record(s.journey)||!['requested','accompanied','leftBehind'].every(k=>Array.isArray((s.journey as Record<string,unknown>)[k])&&((s.journey as Record<string,unknown>)[k] as unknown[]).every(x=>typeof x==='string'&&Object.hasOwn(companionLabels,x))))throw Error('Invalid family journey');
+    const j=s.journey as unknown as NonNullable<State['journey']>;
+    if(Object.values(j).some(v=>new Set(v).size!==v.length)||j.accompanied.some(x=>!j.requested.includes(x)||j.leftBehind.includes(x)))throw Error('Inconsistent family journey');
+  }
   const state=s as unknown as State;
   if(state.alive&&!Number.isInteger(state.age))throw Error('Invalid living age');
   if(state.history.some((h,i)=>i>0&&h.age<state.history[i-1].age))throw Error('Invalid chronology');

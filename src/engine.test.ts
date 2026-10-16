@@ -4,7 +4,7 @@ import {remainingLifeExpectancy} from './mortality';
 import {serialize,deserialize} from './save';
 import {play,gameplaySummary} from './simulation';
 const event=(id:string)=>EVENTS.find(e=>e.id===id)!;
-function adult(age=40):State {const s=createGame(42);s.age=age;s.career='国家IT技術者';s.flags=['recruited','interviewed'];return s;}
+function adult(age=40):State {const s=createGame(42);s.age=age;s.career='国家IT技術者';s.flags=['recruited','interviewed','dating'];return s;}
 function outcome(s:State,e:Event,index:number,want=true):State {
   // Transition witness only: find RNG state without bypassing eligibility/effects.
   for(let seed=0;seed<200000;seed++){const r=applyChoice({...s,seed},e,index);if(r.success===want)return r.state;}

@@ -1,8 +1,10 @@
 import type {State, Stat} from './engine';
 import {mixSeed} from './random';
+import {politicalYear} from './social-world';
 
 /** Ordinary years never make major life decisions or consume the outcome RNG. */
 export function dailyLife(s:State):void {
+  const atmosphere=politicalYear(s);
   const childhood=['窓から差す光を追って、一日が過ぎた。','食卓の湯気と家族の声が、日々の記憶になった。','雨の日は家の中で、身近な物を遊び道具にした。','寒い朝、家族が服の襟を直してくれた。'];
   const school=['ノートの余白に、授業とは関係のない図を描いた。','帰り道の景色を眺めながら、覚えた言葉を口の中で繰り返した。','難しい問題を解けた日は、少しだけ足取りが軽かった。','古い教科書を読み返すうちに、夕方になった。','休み時間の何でもない会話が、妙に心に残った。'];
   const work=['昨日の作業を見直し、小さな間違いを一つ直した。','同じ道を行き来するうちに、季節が変わっていた。','慌ただしい週が終わり、ようやく机の上を片づけた。','読みかけの本を数ページ進めてから、明かりを消した。','誰にも見せないメモに、思いついたことを書き留めた。','いつもより早く起きて、静かな朝を過ごした。'];
@@ -24,5 +26,20 @@ export function dailyLife(s:State):void {
     const focus=focuses.find(([flag])=>s.flags.includes(flag));
     if(focus){focus[1].forEach(stat=>grow(stat));context+=' 選んだ日々の取り組みを、今年も続けた。';}
   }
-  s.history.push({age:s.age,kind:'daily',title:'日々の記録',detail:s.age%3===0?`${line} ${context}`:line});
+  if(s.familyStatus==='married'&&!s.flags.includes('separated:spouse')&&!s.retired){
+    if(s.flags.includes('dual_income')){grow('wealth',2);s.risks.stress=Math.min(100,s.risks.stress+1);}
+    if(s.flags.includes('home_focus')){s.family=Math.min(100,s.family+1);s.risks.stress=Math.max(0,s.risks.stress-1);}
+  }
+  if(s.flags.some(f=>f.startsWith('separated:'))&&s.age%3===0)context='国内に残した家族を思い、離れて暮らす年月の長さを感じた。';
+  else if(s.flags.includes('dating')&&s.familyStatus==='single')context='交際相手と近況を話し合う時間をつくった。';
+  else if(s.familyStatus==='married'&&s.flags.includes('dual_income'))context='ふたりの仕事と家事をやりくりし、少しずつ生活費を蓄えた。';
+  const count=s.age<18?3+(mixSeed(s.seed^s.age)%2):1;
+  const seasons=count===3?['春','夏','冬']:['春','夏','秋','冬'];
+  for(let i=0;i<count;i++){
+    let detail=count===1?line:pool[(mixSeed(s.birthYear)+s.age*3+i)%pool.length];
+    if(i===count-1&&s.age%3===0)detail+=' '+context;
+    if(i===0&&atmosphere.news)detail=atmosphere.news;
+    if((count===1||i===1)&&atmosphere.consequence)detail+=(detail?' ':'')+atmosphere.consequence;
+    s.history.push({age:s.age,kind:'daily',title:count===1?'日々の記録':seasons[i]+'の記録',detail});
+  }
 }

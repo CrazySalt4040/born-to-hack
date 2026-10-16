@@ -11,7 +11,7 @@ it('reaches the age-15 crossroads after four meaningful choices, with daily reco
   }
   expect(seen).toEqual(['school','child-inheritance','radio','olympiad']);
   expect(s.age).toBe(15);expect(nextAvailableEvent(s)?.id).toBe('early');
-  expect(s.history.filter(h=>h.kind==='daily')).toHaveLength(15);
+  for(let age=1;age<=15;age++)expect(s.history.filter(h=>h.kind==='daily'&&h.age===age).length).toBeGreaterThanOrEqual(3);
   expect(progress(s)).toBe(s); // Never chooses at a crossroads.
 });
 it('daily playback and skipping to a crossroads produce the same saved state',()=>{
