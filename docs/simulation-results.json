@@ -1,0 +1,68 @@
+{
+  "model": {
+    "year": 2021,
+    "sex": "both sexes",
+    "targetE0": 72.6,
+    "url": "https://cdn.who.int/media/docs/default-source/searo/his/hrh-profiles/dpr-korea_hrh_countryprofile_final_09232024.pdf",
+    "method": "Synthetic age curve, scalar hazard fitted to period e0; midpoint deaths, terminal age 120"
+  },
+  "hazardScale": 0.9928088759778735,
+  "expectedE0": 72.60000000000001,
+  "expectedRemainingAt15": 59.47404813605256,
+  "expectedRemainingAt60": 18.895416589525666,
+  "baseline": {
+    "birthMean": 72.51873,
+    "standardError": 0.057733028604699,
+    "conditional15Mean": 74.41313724684714,
+    "remainingAt15": 59.41313724684714,
+    "infantRate": 0.01659,
+    "samples": 100000
+  },
+  "gameplay": {
+    "samples": 2000,
+    "seed": 9001,
+    "policy": "uniform eligible choices",
+    "meanDeathAge": 69.794,
+    "recruitedRate": 0.979,
+    "interviewedRate": 0.977,
+    "legendaryRate": 0,
+    "careerCounts": {
+      "国家IT技術者": 122,
+      "外交官": 8,
+      "フリーランス": 449,
+      "ゲーム開発者": 81,
+      "引退した技術者": 460,
+      "技術顧問": 294,
+      "起業家": 162,
+      "大学教授": 78,
+      "投資家": 17,
+      "政治家": 78,
+      "AI研究者": 11,
+      "海外IT請負業者": 19,
+      "ジャーナリスト": 10,
+      "学生": 42,
+      "サイバー犯罪組織幹部": 31,
+      "翻訳者": 9,
+      "ホワイトハッカー": 33,
+      "社会活動家": 14,
+      "教育者": 12,
+      "企業役員": 8,
+      "サイバー防衛専門家": 9,
+      "セキュリティ研究者": 12,
+      "情報機関協力者": 9,
+      "公務員": 10,
+      "作家": 12,
+      "芸術家": 10
+    },
+    "observedEndings": 186,
+    "observedEvents": 40
+  },
+  "catalogCount": 585,
+  "eventCount": 44,
+  "limitations": [
+    "Age-specific curve is synthetic, not an observed life table.",
+    "Uniform random choices are not an optimal career policy.",
+    "Observed endings do not prove every catalog entry reachable from birth.",
+    "Rare transition witnesses are tested separately from population sampling."
+  ]
+}
