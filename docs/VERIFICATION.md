@@ -5,8 +5,8 @@ Local environment: Windows, Node 24.19.0, pnpm 11.25.0. Checked 2026-10-16.
 ## Automated checks
 
 - TypeScript: `tsc -p tsconfig.server.json --noEmit` (browser, API, scripts and tests).
-- Vitest: 35 tests passed, engine and actual HTTP/API/cache tests.
-- Production Vite build: passed. Browser JS approximately 283 KB uncompressed / 92 KB gzip; no server AI SDK or key in browser bundle.
+- Vitest: 41 tests passed, engine and actual HTTP/API/cache tests.
+- Production Vite build: passed. Browser JS approximately 296 KB uncompressed / 97 KB gzip; no server AI SDK or key in browser bundle.
 - Optional Node API SSR build: passed.
 - Browser smoke check: seed42 start and reload persistence (initial v0.3), completed-life import, ending API fallback, saved-result reload; no browser warnings/errors observed. Full mobile/device testing is deferred.
 - Baseline and actual gameplay population script: passed; results saved to `simulation-results.json`.
@@ -35,7 +35,7 @@ The confidence interval describes sampling error of this model, not demographic 
 
 - Mean death age69.794 years.
 - Recruited97.9%; interview completed97.7%. Earlier deaths explain most missing common-route completions.
-- 26 final careers observed, 187 distinct ending IDs, 40/44 event definitions encountered.
+- 26 final careers observed, 186 distinct ending IDs, 40/44 event definitions encountered.
 - Legendary achievements0/2000. A rare event's absence is flagged as a coverage limit, not called unreachable.
 - All30 careers have executable producing transitions; four rare outcomes tested by searching valid RNG states of qualified fixtures. This is not an exhaustive search of newborn seeds.
 - 585 catalog IDs have unique mappings from compatible fact states. This is not 585 independent full-playthrough witnesses.
@@ -57,3 +57,7 @@ Daily prose uses age/life-context templates, not a live AI call. Baseline mortal
 Six additional tests verify 3–4 childhood entries per year without choices, bounded/reproducible independent political RNG, hidden-stat incidents and their costs, explicit dating/marriage/parenthood/work transitions, chosen/failed family departures, and optional-field validation/legacy-save compatibility. Politics is fictional: surveillance/law indices stay in [35,65] and move by at most3 per year. Domestic risky-choice probabilities shift at most1.2 percentage points from this climate. The uniform simulation uses the default solo departure; companion outcomes are tested separately.
 
 Browser follow-up: five stat values visible, old-save resume, successful dating, marriage rejection, political headlines, parent checkbox at departure and failed migration leaving everyone domestic; no console warnings/errors. Childhood restart was blocked by the browser confirmation-dialog API; annual childhood counts are covered by automated tests, not claimed as a completed browser replay.
+
+## Lifestyle and narrative update
+
+Six additional tests cover no immediate rewards from editing preferences, annual learning/health/spending tradeoffs, insufficient funds, age limits, confinement, deterministic replay, qualitative labels, monetary valuation, fact-based outcome prose, rejected business-sale proceeds, and preservation of legacy ending prose. Browser QA on the separate localhost save confirms qualitative labels, USD valuation, exercise/learning preference selection, pause during editing and event-specific result text. Population sampling uses the default balanced preferences, not an exhaustive strategy sweep. The money display is a fixed fictional valuation of the retained wealth score, not a cash-flow ledger.

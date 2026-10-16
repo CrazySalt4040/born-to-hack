@@ -20,7 +20,7 @@ export function buildEvents(original:Event[],careers:string[]):Event[] {
       {text:'学習資金を残す',base:100,effects:{tech:5},risks:{nutrition:-10},flags:['lean_childhood']},
     ]),
     scene('child-inheritance',8,10,'親族の遺したもの','家族の遺産をめぐる審査が行われる。資産は管理され、自由に持ち出せる金額ではない。',[
-      ...[20,40,60,80].map(wealth=>({text:`家族の取り分を申請する（資産水準+${wealth}）`,base:15,effects:{suspicion:3},successEffects:{wealth},flags:['family_inheritance'],success:'申請が認められ、家族の資産が増えた。'})),
+      ...[20,40,60,80].map(wealth=>({text:`家族の取り分を申請する（${wealth===20?'小さな持分':wealth===40?'一定の持分':wealth===60?'大きな持分':'最大の持分'}）`,base:15,effects:{suspicion:3},successEffects:{wealth},flags:['family_inheritance'],success:'申請が認められ、家族の資産が増えた。'})),
     ]),
     scene('child-echo',26,39,'かつての放課後','幼い日のコードを覚えている恩師が、研究の席を紹介してくれた。',[
       {text:'恩師と研究を始める',base:75,effects:{tech:12,network:10},flags:['mentor_returned']},
@@ -100,7 +100,7 @@ export function buildEvents(original:Event[],careers:string[]):Event[] {
       {text:'事業を立ち上げる',base:35,minimum:{tech:60,network:50},career:'起業家',flags:['business'],effects:{wealth:-15},risk:10},
     ],common),
     scene('sale',50,65,'事業売却の提案','会社を買い取りたいという打診がある。条件交渉は簡単ではない。',[
-      {text:'売却交渉に入る',base:40,effects:{wealth:40},flags:['sold_business'],removeFlags:['business']},
+      {text:'売却交渉に入る',base:40,successEffects:{wealth:40},flags:['sold_business'],removeFlags:['business']},
     ],{requires:[...common.requires,'business']}),
     scene('fall',55,70,'地位を揺るがす疑惑','古い取引が監査の対象になる。肩書きがあっても、信用は崩れる。',[
       {text:'監査に協力する',base:60,effects:{wealth:-10,suspicion:-8},failureFlags:['disgraced'],failureCareer:'フリーランス',risk:12},

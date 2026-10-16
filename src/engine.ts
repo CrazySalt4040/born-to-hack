@@ -1,3 +1,5 @@
+import {describeOutcome} from './outcomes';
+import {assetValue,formatMoney,type Habits} from './lifestyle';
 import {initialClimate,isDeparture,availableCompanions,companionLabels,type Companion,type PoliticalClimate} from './social-world';
 import {random, mixSeed} from './random';
 import {dailyLife} from './daily-life';
@@ -13,7 +15,7 @@ export type State = {
   flags:string[]; history:{age:number;title:string;detail:string;kind?:'daily'}[]; career:string; country:string;
   family:number; familyStatus:FamilyStatus; children:number; grandchildren:number;
   risks:Risks; retired:boolean; residenceSince:number; eventIndex:number; seed:number;
-  ending?:Ending; achievements:string[]; world?:PoliticalClimate; journey?:{requested:Companion[];accompanied:Companion[];leftBehind:Companion[]};
+  ending?:Ending; achievements:string[]; habits?:Habits; moneyDisplay?:1; world?:PoliticalClimate; journey?:{requested:Companion[];accompanied:Companion[];leftBehind:Companion[]};
 };
 export type Choice = {
   text:string; description?:string; effects?:Partial<Record<Stat,number>>; flags?:string[];
@@ -26,11 +28,11 @@ export type Choice = {
 };
 export type Event = {id:string;min:number;max:number;title:string;story:string;choices:Choice[];requires?:string[];excludes?:string[];countries?:string[];repeat?:number;priority?:number;deferUntilQualified?:boolean};
 export type Ending = {id:string;title:string;story:string;rarity:'normal'|'rare'|'legendary';career:string;age:number;facts:EndingFacts;source:'template'|'ai';resolved?:boolean};
-export type EndingFacts = {birthYear:number;age:number;career:string;country:string;familyStatus:FamilyStatus;children:number;grandchildren:number;wealth:number;health:number;family:number;retired:boolean;flags:string[];achievements:string[];choices:State['history']};
+export type EndingFacts = {assetsUSD?:number;birthYear:number;age:number;career:string;country:string;familyStatus:FamilyStatus;children:number;grandchildren:number;wealth:number;health:number;family:number;retired:boolean;flags:string[];achievements:string[];choices:State['history']};
 export const clamp=(n:number)=>Math.max(0,Math.min(100,Math.round(n)));
 export function createGame(seed=Date.now()>>>0):State {
   let n=seed>>>0;const roll=()=>{const v=random(n);n=v[1];return v[0]};
-  return {version:3,age:0,birthYear:1998,alive:true,stats:{tech:15+Math.floor(roll()*26),language:5+Math.floor(roll()*20),network:5+Math.floor(roll()*25),loyalty:35+Math.floor(roll()*35),suspicion:0,health:55+Math.floor(roll()*40),wealth:3+Math.floor(roll()*15),ethics:35+Math.floor(roll()*45),creativity:20+Math.floor(roll()*40),politics:5+Math.floor(roll()*20)},flags:[],history:[{age:0,title:'北朝鮮に誕生',detail:'あなたの人生が始まった。'}],career:'学生',country:'北朝鮮',family:50,familyStatus:'single',children:0,grandchildren:0,risks:{nutrition:50,medical:50,stress:0,childhoodHealth:70},retired:false,residenceSince:0,eventIndex:0,seed:n,world:initialClimate(seed),achievements:[]};
+  return {version:3,moneyDisplay:1,age:0,birthYear:1998,alive:true,stats:{tech:15+Math.floor(roll()*26),language:5+Math.floor(roll()*20),network:5+Math.floor(roll()*25),loyalty:35+Math.floor(roll()*35),suspicion:0,health:55+Math.floor(roll()*40),wealth:3+Math.floor(roll()*15),ethics:35+Math.floor(roll()*45),creativity:20+Math.floor(roll()*40),politics:5+Math.floor(roll()*20)},flags:[],history:[{age:0,title:'北朝鮮に誕生',detail:'あなたの人生が始まった。'}],career:'学生',country:'北朝鮮',family:50,familyStatus:'single',children:0,grandchildren:0,risks:{nutrition:50,medical:50,stress:0,childhoodHealth:70},retired:false,residenceSince:0,eventIndex:0,seed:n,world:initialClimate(seed),achievements:[]};
 }
 export const careers=['国家IT技術者','海外IT請負業者','セキュリティ研究者','ホワイトハッカー','AI研究者','ゲーム開発者','大学教授','起業家','サイバー犯罪組織幹部','情報機関協力者','サイバー防衛専門家','技術顧問','ジャーナリスト','外交官','社会活動家','教育者','作家','翻訳者','政治家','投資家','フリーランス','企業役員','公務員','芸術家','引退した技術者','学生','国家指導者','任天堂クリエイター','パリ市長','ニューヨーク市長'];
 const standings=['困窮','質素','安定','富裕','大富豪'];
@@ -43,10 +45,10 @@ export const legendary=[{id:'L-01',name:'北朝鮮の総書記',condition:'架�
 const legendCareer:Record<string,string>={'国家指導者':'L-01','任天堂クリエイター':'L-02','パリ市長':'L-03-P','ニューヨーク市長':'L-03-N'};
 export const eligibleLegendary=(s:State)=>s.achievements[0];
 export function endingFacts(s:State):EndingFacts {
-  return {birthYear:s.birthYear,age:s.age,career:s.career,country:s.country,familyStatus:s.familyStatus,children:s.children,grandchildren:s.grandchildren,wealth:s.stats.wealth,health:s.stats.health,family:s.family,retired:s.retired,flags:[...s.flags].sort(),achievements:[...s.achievements].sort(),choices:s.history.map(h=>({...h}))};
+  return {...(s.moneyDisplay===1?{assetsUSD:assetValue(s.stats.wealth)}:{}),birthYear:s.birthYear,age:s.age,career:s.career,country:s.country,familyStatus:s.familyStatus,children:s.children,grandchildren:s.grandchildren,wealth:s.stats.wealth,health:s.stats.health,family:s.family,retired:s.retired,flags:[...s.flags].sort(),achievements:[...s.achievements].sort(),choices:s.history.map(h=>({...h}))};
 }
 export function factSentences(f:EndingFacts):string[] {
-  return [`${f.birthYear}年、北朝鮮に生まれ、${f.age}歳で生涯を閉じた。`,`最後の職業は${f.career}、居住地は${f.country}。${f.retired?'引退していた。':f.career==='学生'?'学びの途中で人生を終えた。':'現役のまま人生を終えた。'}`,`家族関係は${familyLabels[f.familyStatus]}。子ども${f.children}人、孫${f.grandchildren}人。家族との親密さは${f.family}/100だった。`,`資産水準は${f.wealth}/100、最期の健康は${f.health}/100。`,`実績：${f.achievements.map(id=>legendary.find(l=>l.id===id)?.name??id).join('、')||'特別実績なし'}。`,`人生に残った選択：${f.choices.filter(h=>h.title!=='人生の終わり'&&h.kind!=='daily').slice(-4).map(h=>`${h.age}歳「${h.title}」${h.detail.replace(/。$/,'')}`).join('／')}。`,`過去の影響：${f.flags.map(x=>flagLabels[x]).filter(Boolean).join('、')||'記録なし'}。`];
+  return [`${f.birthYear}年、北朝鮮に生まれ、${f.age}歳で生涯を閉じた。`,`最後の職業は${f.career}、居住地は${f.country}。${f.retired?'引退していた。':f.career==='学生'?'学びの途中で人生を終えた。':'現役のまま人生を終えた。'}`,`家族関係は${familyLabels[f.familyStatus]}。子ども${f.children}人、孫${f.grandchildren}人。家族との親密さは${f.family}/100だった。`,f.assetsUSD===undefined?`資産水準は${f.wealth}/100、最期の健康は${f.health}/100。`:`推定資産は${formatMoney(f.assetsUSD)}（ゲーム内換算）、最期の健康は${f.health}/100。`,`実績：${f.achievements.map(id=>legendary.find(l=>l.id===id)?.name??id).join('、')||'特別実績なし'}。`,`人生に残った選択：${f.choices.filter(h=>h.title!=='人生の終わり'&&h.kind!=='daily').slice(-4).map(h=>`${h.age}歳「${h.title}」${h.detail.replace(/。$/,'')}`).join('／')}。`,`過去の影響：${f.flags.map(x=>flagLabels[x]).filter(Boolean).join('、')||'記録なし'}。`];
 }
 export function makeEnding(s:State):Ending {
   if(s.alive)throw Error('A living person has no ending');
@@ -102,12 +104,12 @@ export function applyChoice(state:State,event:Event,index:number,companions:Comp
   }
   if(s.age<15)s.risks.childhoodHealth=clamp((s.risks.childhoodHealth+s.stats.health)/2);
   s.eventIndex++;
-  let result=success?(c.success??'選択は将来に影響を残した。'):(c.failure??'思い通りには進まなかった。');
+  let result=describeOutcome(state,s,event,c,success);
   if(isDeparture(state,c))result+=success?` 同行：${companions.map(x=>companionLabels[x]).join('・')||'自分のみ'}。国内に残る家族：${s.journey!.leftBehind.map(x=>companionLabels[x]).join('・')||'なし'}。`:' 同行を希望した家族も含め、移住は実現しなかった。';
   s.history.push({age:s.age,title:event.title,detail:`${c.text} — ${result}`});return {state:s,result,success};
 }
 export function markEvent(s:State,id:string):State{return {...s,flags:[...new Set([...s.flags,'event:'+id])]};}
-function copyState(s:State):State{return {...s,stats:{...s.stats},risks:{...s.risks},flags:[...s.flags],history:[...s.history],achievements:[...s.achievements]};}
+function copyState(s:State):State{return {...s,moneyDisplay:1,stats:{...s.stats},risks:{...s.risks},flags:[...s.flags],history:[...s.history],achievements:[...s.achievements]};}
 export function advance(state:State,years:number):State {
   if(!Number.isInteger(years)||years<0)throw Error('Years must be nonnegative integer');
   if(!state.alive)return state;

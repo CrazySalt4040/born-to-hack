@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3 lifestyle and narrative update — 2026-10-16
+
+- Replace numeric success probabilities with qualitative likelihood labels while preserving deterministic engine rolls.
+- Describe choices through event-specific consequences and actual career/country/asset changes; remove success/failure badges.
+- Add persistent time and spending priorities, annual effects/costs, affordability and confinement handling, with paused automatic playback while editing.
+- Display assets as a documented fictional USD valuation instead of a score/bar. Preserve old saved ending text and use monetary values in new summaries.
+- Fix sale proceeds being credited on a rejected business sale.
+- Add six regression tests covering habits, tradeoffs, persistence, narrative outcomes, rejected proceeds, and old/new ending compatibility.
+
 ## 0.3 family and world update — 2026-10-16
 
 - Reduce the stat panel to five visible attributes; keep suspicion and loyalty hidden, with occasional consequential daily incidents.

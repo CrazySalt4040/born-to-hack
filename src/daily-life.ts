@@ -1,3 +1,4 @@
+import {applyHabits} from './lifestyle';
 import type {State, Stat} from './engine';
 import {mixSeed} from './random';
 import {politicalYear} from './social-world';
@@ -21,7 +22,7 @@ export function dailyLife(s:State):void {
   }
   const grow=(stat:Stat,n=1)=>s.stats[stat]=Math.min(100,s.stats[stat]+n);
   if(s.age>=6&&s.age<=29){grow('tech');if(s.age%2===0){grow('language');grow('network');grow('creativity');}}
-  if(s.age>=30&&s.age<=74&&!s.retired&&!s.flags.includes('imprisoned')){
+  if((!s.habits||s.habits.time==='balanced')&&s.age>=30&&s.age<=74&&!s.retired&&!s.flags.includes('imprisoned')){
     const focuses:[string,Stat[]][]=[['routine:craft',['tech','creativity']],['routine:language',['language','network']],['routine:policy',['politics','loyalty','network']],['routine:saving',['wealth']],['routine:community',['ethics']]];
     const focus=focuses.find(([flag])=>s.flags.includes(flag));
     if(focus){focus[1].forEach(stat=>grow(stat));context+=' 選んだ日々の取り組みを、今年も続けた。';}
@@ -33,6 +34,7 @@ export function dailyLife(s:State):void {
   if(s.flags.some(f=>f.startsWith('separated:'))&&s.age%3===0)context='国内に残した家族を思い、離れて暮らす年月の長さを感じた。';
   else if(s.flags.includes('dating')&&s.familyStatus==='single')context='交際相手と近況を話し合う時間をつくった。';
   else if(s.familyStatus==='married'&&s.flags.includes('dual_income'))context='ふたりの仕事と家事をやりくりし、少しずつ生活費を蓄えた。';
+  const habitLog=applyHabits(s);
   const count=s.age<18?3+(mixSeed(s.seed^s.age)%2):1;
   const seasons=count===3?['春','夏','冬']:['春','夏','秋','冬'];
   for(let i=0;i<count;i++){
@@ -40,6 +42,7 @@ export function dailyLife(s:State):void {
     if(i===count-1&&s.age%3===0)detail+=' '+context;
     if(i===0&&atmosphere.news)detail=atmosphere.news;
     if((count===1||i===1)&&atmosphere.consequence)detail+=(detail?' ':'')+atmosphere.consequence;
+    if(i===count-1&&habitLog&&(s.age%3===0||habitLog.includes('余裕がなく')))detail+=' '+habitLog;
     s.history.push({age:s.age,kind:'daily',title:count===1?'日々の記録':seasons[i]+'の記録',detail});
   }
 }
