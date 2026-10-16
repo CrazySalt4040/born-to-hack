@@ -1,0 +1,31 @@
+{
+  "name": "born-to-hack",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -p tsconfig.server.json --noEmit && vite build && vite build --ssr server/index.ts --outDir dist-server",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.server.json --noEmit",
+    "start:api": "node dist-server/index.js",
+    "simulate": "vite build --ssr scripts/simulate.ts --outDir dist-sim && node dist-sim/simulate.js"
+  },
+  "dependencies": {
+    "ai": "^7.0.141",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "~5.7.3",
+    "vite": "^6.0.5",
+    "vitest": "^2.1.8"
+  },
+  "packageManager": "pnpm@11.25.0"
+}
