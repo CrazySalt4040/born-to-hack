@@ -32,11 +32,12 @@ describe('time, prerequisites and common origin',()=>{
     const dead=advance(s,120);expect(dead.alive).toBe(false);expect(nextAvailableEvent(dead)).toBeUndefined();expect(advance(dead,30)).toBe(dead);
     expect(()=>applyChoice(dead,event('old'),0)).toThrow();expect(()=>makeEnding(s)).toThrow();
   });
-  it('skips expired events and only repeats at the specified interval',()=>{
+  it('skips expired events and never repeats resolved ordinary crossroads',()=>{
     expect(progress(adult(111)).alive).toBe(false);
     const old=applyChoice(adult(75),event('old'),2).state;
     expect(()=>applyChoice(old,event('old'),2)).toThrow();expect(()=>applyChoice({...old,age:76},event('old'),2)).toThrow();
-    expect(applyChoice({...old,age:80},event('old'),2).state.age).toBe(80);
+    expect(()=>applyChoice({...old,age:80},event('old'),2)).toThrow();
+    expect(()=>applyChoice({...adult(80),flags:[...adult(80).flags,'event:old:75']},event('old'),2)).toThrow();
   });
   it('covers infancy and rejects invalid time travel',()=>{
     const s=createGame(1);s.seed=1972;expect(advance(s,1).age).toBe(.5);

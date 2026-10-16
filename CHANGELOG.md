@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3 pacing update — 2026-10-16
+
+- Replace 100 recurring mundane prompts with annual contextual logs and gradual skill development; retain the original definitions as reference.
+- Automatically advance between crossroads, with pause, 3x speed, and skip-to-next controls. Pause on hidden tabs, other views, reload and import.
+- Remove the extra result-confirmation click and repeated practice/old-age/care/happiness questions; continue the chosen practice annually.
+- Preserve prior repeat markers and immutable saved endings. Add four pacing/replay regression tests and refresh population results.
+
 ## 0.3.0 — 2026-10-16
 
 - Import supplied v0.2 implementation into the existing README-only repository on a dedicated branch.

@@ -1,4 +1,5 @@
 import {random, mixSeed} from './random';
+import {dailyLife} from './daily-life';
 import {mortality, type Risks} from './mortality';
 import {EVENTS as ORIGINAL, SUPPLEMENTAL_EVENTS} from './legacy-events';
 import {buildEvents} from './life-events';
@@ -8,7 +9,7 @@ export const statNames: Stat[] = ['tech','language','network','loyalty','suspici
 export type FamilyStatus = 'single'|'married'|'divorced'|'widowed';
 export type State = {
   version:3; age:number; birthYear:number; alive:boolean; stats:Record<Stat,number>;
-  flags:string[]; history:{age:number;title:string;detail:string}[]; career:string; country:string;
+  flags:string[]; history:{age:number;title:string;detail:string;kind?:'daily'}[]; career:string; country:string;
   family:number; familyStatus:FamilyStatus; children:number; grandchildren:number;
   risks:Risks; retired:boolean; residenceSince:number; eventIndex:number; seed:number;
   ending?:Ending; achievements:string[];
@@ -44,7 +45,7 @@ export function endingFacts(s:State):EndingFacts {
   return {birthYear:s.birthYear,age:s.age,career:s.career,country:s.country,familyStatus:s.familyStatus,children:s.children,grandchildren:s.grandchildren,wealth:s.stats.wealth,health:s.stats.health,family:s.family,retired:s.retired,flags:[...s.flags].sort(),achievements:[...s.achievements].sort(),choices:s.history.map(h=>({...h}))};
 }
 export function factSentences(f:EndingFacts):string[] {
-  return [`${f.birthYear}年、北朝鮮に生まれ、${f.age}歳で生涯を閉じた。`,`最後の職業は${f.career}、居住地は${f.country}。${f.retired?'引退していた。':f.career==='学生'?'学びの途中で人生を終えた。':'現役のまま人生を終えた。'}`,`家族関係は${familyLabels[f.familyStatus]}。子ども${f.children}人、孫${f.grandchildren}人。家族との親密さは${f.family}/100だった。`,`資産水準は${f.wealth}/100、最期の健康は${f.health}/100。`,`実績：${f.achievements.map(id=>legendary.find(l=>l.id===id)?.name??id).join('、')||'特別実績なし'}。`,`人生に残った選択：${f.choices.filter(h=>h.title!=='人生の終わり').slice(-4).map(h=>`${h.age}歳「${h.title}」${h.detail.replace(/。$/,'')}`).join('／')}。`,`過去の影響：${f.flags.map(x=>flagLabels[x]).filter(Boolean).join('、')||'記録なし'}。`];
+  return [`${f.birthYear}年、北朝鮮に生まれ、${f.age}歳で生涯を閉じた。`,`最後の職業は${f.career}、居住地は${f.country}。${f.retired?'引退していた。':f.career==='学生'?'学びの途中で人生を終えた。':'現役のまま人生を終えた。'}`,`家族関係は${familyLabels[f.familyStatus]}。子ども${f.children}人、孫${f.grandchildren}人。家族との親密さは${f.family}/100だった。`,`資産水準は${f.wealth}/100、最期の健康は${f.health}/100。`,`実績：${f.achievements.map(id=>legendary.find(l=>l.id===id)?.name??id).join('、')||'特別実績なし'}。`,`人生に残った選択：${f.choices.filter(h=>h.title!=='人生の終わり'&&h.kind!=='daily').slice(-4).map(h=>`${h.age}歳「${h.title}」${h.detail.replace(/。$/,'')}`).join('／')}。`,`過去の影響：${f.flags.map(x=>flagLabels[x]).filter(Boolean).join('、')||'記録なし'}。`];
 }
 export function makeEnding(s:State):Ending {
   if(s.alive)throw Error('A living person has no ending');
@@ -61,7 +62,7 @@ export function isEventEligible(s:State,e:Event) {
   if(e.countries&&!e.countries.includes(s.country))return false;
   if(e.deferUntilQualified&&!e.choices.slice(0,-1).some(c=>canChoose(s,c)))return false;
   if(e.repeat&&(s.age-e.min)%e.repeat!==0)return false;
-  return !s.flags.includes(eventMark(e,s.age));
+  return !s.flags.includes(eventMark(e,s.age))&&(!!e.repeat||!s.flags.some(f=>f.startsWith(`event:${e.id}:`)));
 }
 export function canChoose(s:State,c:Choice) {
   return s.alive&&!c.requires?.some(f=>!s.flags.includes(f))&&!(c.countries&&!c.countries.includes(s.country))&&!(c.residentYears!==undefined&&s.age-s.residenceSince<c.residentYears)&&Object.entries(c.minimum??{}).every(([key,n])=>s.stats[key as Stat]>=n);
@@ -107,12 +108,12 @@ export function advance(state:State,years:number):State {
     // q_x covers [x,x+1), including infancy. Midpoint death convention.
     if(r<mortality(s.age,s.stats.health,s.country,s.risks,s.flags)){
       s.age+=.5;s.alive=false;s.history.push({age:s.age,title:'人生の終わり',detail:'病気・事故等を含む総死亡リスクの判定により生涯を閉じた。'});s.ending=makeEnding(s);
-    }else{s.age++;if(s.age>=55&&s.age%3===0)s.stats.health=clamp(s.stats.health-1);}
+    }else{s.age++;dailyLife(s);if(s.age>=55&&s.age%3===0)s.stats.health=clamp(s.stats.health-1);}
   }
   return s;
 }
 export const EVENTS:Event[]=buildEvents(ORIGINAL,careers);
-export const ALL_EVENTS:Event[]=[...EVENTS,...SUPPLEMENTAL_EVENTS].sort((a,b)=>(b.priority??0)-(a.priority??0)||a.min-b.min||a.id.localeCompare(b.id));
+export const ALL_EVENTS:Event[]=EVENTS.filter(e=>e.id!=='nutrition').sort((a,b)=>(b.priority??0)-(a.priority??0)||a.min-b.min||a.id.localeCompare(b.id));
 export function nextAvailableEvent(s:State){return ALL_EVENTS.find(e=>isEventEligible(s,e));}
 export const nextEvent=nextAvailableEvent;
 export function progress(state:State):State{let s=state;while(s.alive&&!nextAvailableEvent(s))s=advance(s,1);return s;}

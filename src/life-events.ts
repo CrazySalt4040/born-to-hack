@@ -11,7 +11,6 @@ export function buildEvents(original:Event[],careers:string[]):Event[] {
     if(e.min>=22)e.requires=['recruited','interviewed'];
     if(e.id==='pivot')e.choices[3].flags=['underground','hazardous_work'];
     if(e.id==='retire'){e.choices[0].retired=true;e.choices[0].family=15;e.choices[0].flags=['retired'];}
-    if(e.id==='old')e.repeat=5;
   }
   const common={requires:['recruited','interviewed']};
   const rareBase={...common,priority:20};
@@ -31,13 +30,13 @@ export function buildEvents(original:Event[],careers:string[]):Event[] {
     ],{requires:[...common.requires,'child_friend']}),
     scene('career-market',35,55,'専門を選び直す','国家ITで得た経験を基に、次の専門職へ応募する。採用は能力と審査次第だ。',
       careers.slice(0,24).map(career=>({text:`${career}を目指す`,career,base:35,risk:8,minimum:{tech:45},effects:{wealth:4},...(career==='ゲーム開発者'?{flags:['game_portfolio']}:{}),...(career==='サイバー犯罪組織幹部'?{flags:['underground','hazardous_work']}:{}),...(career==='政治家'?{effects:{politics:12}}:{})})),common),
-    scene('practice',30,74,'長い研鑽','仕事と学習の時間を配分し、次の機会に備える。',[
-      {text:'技術と作品を磨く',base:100,effects:{tech:8,creativity:8},flags:['game_portfolio']},
-      {text:'語学と人脈を磨く',base:100,effects:{language:10,network:8}},
-      {text:'政策と組織運営を学ぶ',base:100,effects:{politics:10,loyalty:8,network:5}},
-      {text:'家計を立て直す',base:100,effects:{wealth:12,health:-2}},
-      {text:'家族や地域に寄付する',base:100,effects:{wealth:-20,ethics:6},family:5},
-    ],{...common,repeat:2}),
+    scene('practice',30,74,'長い研鑽','これからの日々で大切にする取り組みを選ぶ。以後は日常の中で少しずつ力が育つ。',[
+      {text:'技術と作品を磨く',base:100,effects:{tech:8,creativity:8},flags:['game_portfolio','routine:craft']},
+      {text:'語学と人脈を磨く',base:100,effects:{language:10,network:8},flags:['routine:language']},
+      {text:'政策と組織運営を学ぶ',base:100,effects:{politics:10,loyalty:8,network:5},flags:['routine:policy']},
+      {text:'家計を立て直す',base:100,effects:{wealth:12,health:-2},flags:['routine:saving']},
+      {text:'家族や地域に寄付する',base:100,effects:{wealth:-20,ethics:6},family:5,flags:['routine:community']},
+    ],common),
     scene('legal-move',32,43,'新しい居住地への申請','再定住後、移民・就労審査を受ける。申請が通る保証はない。',[
       {text:'日本での就労許可を申請する',base:40,minimum:{language:55,tech:60},country:'日本',flags:['japan_legal']},
       {text:'フランスでの長期滞在を申請する',base:40,minimum:{language:55},country:'フランス',flags:['france_resident','paris_resident']},
@@ -113,7 +112,7 @@ export function buildEvents(original:Event[],careers:string[]):Event[] {
     scene('care',65,95,'介護を受ける日々','家族だけで支えるには負担が大きい。支援の形を考える。',[
       {text:'介護サービスを探す',base:65,effects:{wealth:-10,health:10},risks:{medical:15,stress:-10}},
       {text:'家族と暮らし方を相談する',base:70,family:10,risks:{stress:-8}},
-    ],{...common,repeat:10}),
+    ],common),
     scene('reemployment',65,80,'引退後の仕事','蓄えと生きがいのため、働き直す道がある。',[
       {text:'再就職に応募する',base:50,career:'技術顧問',effects:{wealth:10,health:-4},removeFlags:['retired']},
       {text:'引退生活を選ぶ',base:100,career:'引退した技術者',retired:true,flags:['retired'],family:10},
@@ -125,7 +124,7 @@ export function buildEvents(original:Event[],careers:string[]):Event[] {
     scene('happiness',75,110,'穏やかな朝','地位では測れない、日々の幸福を振り返る。',[
       {text:'人との時間を大切にする',base:100,family:10,risks:{stress:-15},effects:{health:4}},
       {text:'過去を文章に残す',base:90,effects:{creativity:8},flags:['memoir']},
-    ],{...common,repeat:5}),
+    ],common),
   );
   return events;
 }

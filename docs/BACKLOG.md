@@ -30,3 +30,9 @@
 - [ ] Image asset license, author, attribution and provenance register
 
 Use `src/ArtSlot.tsx` for later image injection. It renders nothing without a supplied asset, accepts alt text and lazy-loads images. Title, event and ending slots are present. Existing Lucide icons/CSS are retained; no generated art or external image assets were added.
+
+## 日常進行の次の改善
+
+- 日常ログの文例を増やし、職業・地域ごとの暮らしを具体化する。現在は年齢・家族・健康・研鑽によるテンプレート。
+- 研鑽方針を任意で変更するUIと、旧セーブの方針設定を検討する（旧セーブの選択を推測して変更しない）。
+- 岐路の集中する年齢帯を追加試遊し、イベントの間隔を調整する。
