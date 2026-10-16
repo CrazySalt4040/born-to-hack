@@ -43,5 +43,5 @@ The confidence interval describes sampling error of this model, not demographic 
 ## External services and remaining checks
 
 - No real AI provider call was made because no key/model was supplied. Validated composition, rejection/fallback, storage and HTTP tests use deterministic providers or no provider.
-- CI configuration is included. Remote Actions and PR creation are not yet verified: Git CLI has no authentication, and GitHub connector tree creation returned403 `Resource not accessible by integration`. No remote branch or PR was created during this run.
+- CI configuration is included. Git authentication was completed and the dedicated branch was successfully pushed. Remote Actions status is reported on the pull request; local verification results above remain separate from remote CI.
 - Age-specific official mortality tables, broad device QA, detailed legal review and exhaustive seeded reachability remain in BACKLOG.
